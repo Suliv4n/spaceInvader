@@ -25,4 +25,19 @@ public abstract class GameObject {
 	public int getY(){
 		return y;
 	}
+	
+	
+	/**
+	 * Déplacer le MOB de dx sur l'axe des abscisces et dy sur l'axe des ordonnées.
+	 * 
+	 * @param dx
+	 * 	Déplacement horizontal.
+	 * @param dy
+	 * 	Déplacement vertical.
+	 */
+	public void move(int dx, int dy){
+		//TODO gestion des collisions ?
+		x += dx;
+		y += dy;
+	}
 }
