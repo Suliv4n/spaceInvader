@@ -14,27 +14,45 @@ public abstract class MOB extends GameObject{
 	private Weapon weapon;
 	private int health;
 	private int max_health;
+	private int speed = 1;
+	private float ratio;
+	
+	private Direction direction;
 	
 	private Sprite sprite;
 	
-	public MOB(int x, int y, int max_health){
+	private int[] weaponPosition;
+	
+	public MOB(int x, int y, int max_health, int speed, Direction direction, float ratio){
 		super(x,y);
 		this.health = max_health;
 		this.max_health = max_health;
+		this.speed = speed;
+		this.direction = direction;
+		this.ratio = ratio;
+		
+		weaponPosition = new int[2];
 	}
 	
 	
 	public void setSprite(Sprite sprite)
 	{
 		this.sprite = sprite;
+		sprite.setScale(ratio);
+		weaponPosition[0] = (int) sprite.getWidth()/2;
+	    weaponPosition[1] = 0;
 	}
 	
 	public Sprite getSprite() {
 		return sprite;
 	}
 	
+	public int getSpeed(){
+		return speed;
+	}
+	
 	/**
-	 * Retourne vrai si le MOB est détruire. Faux sinon.
+	 * Retourne vrai si le MOB est détruit. Faux sinon.
 	 * 
 	 * Le joueur est détruit si l'attribut health est à 0.
 	 * 
@@ -59,6 +77,21 @@ public abstract class MOB extends GameObject{
 		health = Math.min(health, max_health);
 		health = Math.max(health, 0);
 	}
+	
+	/**
+	 * Le MOB tire.
+	 */
+	public Bullet fire(Direction direction)
+	{
+		int bx = x + weaponPosition[0];
+		int by = y + weaponPosition[1];
+		
+		if(direction == Direction.DOWN){
+			by = (int) (y + weaponPosition[1] + sprite.getHeight());
+		}
+		
+		return weapon.fire(bx , by, direction);
+	}
 
 	@Override
 	public void move(int dx, int dy)
@@ -67,4 +100,16 @@ public abstract class MOB extends GameObject{
 		sprite.setX(x);
 		sprite.setY(y);
 	}
+	
+	public void setWeapon(Weapon weapon)
+	{
+		this.weapon = weapon;
+		this.weapon.setOwner(this);
+	}
+	
+	
+	public int getHealth(){
+		return health;
+	}
+	
 }

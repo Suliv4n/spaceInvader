@@ -3,147 +3,152 @@ package fr.licencepro.spaceinvader;
 import org.andengine.engine.Engine;
 import org.andengine.engine.LimitedFPSEngine;
 import org.andengine.engine.camera.Camera;
-import org.andengine.engine.handler.timer.ITimerCallback;
-import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
-import org.andengine.entity.util.FPSLogger;
-import org.andengine.opengl.font.Font;
-import org.andengine.opengl.font.FontFactory;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.andengine.opengl.texture.region.TextureRegion;
-import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.ui.activity.SimpleBaseGameActivity;
-import org.andengine.input.touch.TouchEvent;
+import org.andengine.ui.activity.BaseGameActivity;
+import android.os.Bundle;
+import fr.licencepro.spaceinvader.audio.AudioManager;
+import fr.licencepro.spaceinvader.scenes.GameScene;
+import fr.licencepro.spaceinvader.scenes.MenuScene;
+import fr.licencepro.spaceinvader.scenes.ScenesId;
+import fr.licenpro.spaceinvader.ressources.RessourcesManager;
 
-import fr.licencepro.spaceinvader.object.Player;
-import android.graphics.Typeface;
-import android.util.Log;
+public class MainActivity extends BaseGameActivity {
 
-public class MainActivity extends SimpleBaseGameActivity {
-
-	private static final int CAMERA_WIDTH = 480;
-	private static final int CAMERA_HEIGHT = 720;
 	
-	private Font mFont;
-	private Scene scene;
 	
-	private Player joueur;
-
-	private Camera mCamera;
-
-	private TextureRegion regionImage;
 	
+	private static MainActivity INSTANCE;
+	private Camera camera;
+	private GameScene game;
+	private MenuScene menu;
+	
+	private ScenesId currentScene;
 	
     @Override
     public EngineOptions onCreateEngineOptions() {
-        this.mCamera = new Camera(0,0, CAMERA_WIDTH, CAMERA_HEIGHT);
-        return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new FillResolutionPolicy(), mCamera);
+        this.camera = new Camera(0,0, Config.CAMERA_WIDTH, Config.CAMERA_HEIGHT);
+        EngineOptions options = new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new FillResolutionPolicy(), camera);
+        options.getTouchOptions().setNeedsMultiTouch(true);
+        options.getAudioOptions().setNeedsMusic(true);
+        return options;
     }
  
     @Override
-    protected void onCreateResources() {
-    	mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32);
-    	mFont.load();
+	public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) {
     	
-    	//this.mEngine = new LimitedFPSEngine(this.onCreateEngineOptions(), 60);
+    	RessourcesManager.prepare(this);
     	
-    	//image vaisseau
-    	final BitmapTextureAtlas textureImage = new BitmapTextureAtlas(this.getTextureManager(), 32, 32);
-    	regionImage = BitmapTextureAtlasTextureRegionFactory.createFromAsset(textureImage, this, "ships/red_ship.png", 0, 0);
-    	this.getEngine().getTextureManager().loadTexture(textureImage);
-        
+    	pOnCreateResourcesCallback.onCreateResourcesFinished();
+    	
     }
  
-    @Override
-    protected Scene onCreateScene() {
-    	this.mEngine.registerUpdateHandler(new FPSLogger());
-    	
-    	scene = new Scene();
-    	scene.setBackground(new Background(255, 255, 255));
-    	
-    	final VertexBufferObjectManager vertexBufferObjectManager = this.getVertexBufferObjectManager();
-    	final Text centerText = new Text((CAMERA_WIDTH/2)-100, (CAMERA_HEIGHT/2)-40, this.mFont, "Spaaaaace", vertexBufferObjectManager);
-    	
-    	joueur = new Player(  30, CAMERA_HEIGHT - 50 , 50);
-    	final Sprite sprite = new Sprite(joueur.getX(), joueur.getY(), regionImage, this.getVertexBufferObjectManager());
-    	
-    	joueur.setSprite(sprite);
 
-    	
-    	
-    	
-        this.scene.registerUpdateHandler(new TimerHandler(0.5f, true, new ITimerCallback() {
-            @Override
-            public void onTimePassed(final TimerHandler pTimerHandler) {
-            	//scene.attachChild(joueur.getSprite());
-            	Log.i("position : ",joueur.getX()+" , "+joueur.getY());
-            }
-                    
-            })); 
-
-    	
-    	createControllers();
-    	
-    	scene.attachChild(joueur.getSprite());
-        scene.attachChild(centerText);
-        
-        return scene;
-    }
 
     @Override
     public Engine onCreateEngine(final EngineOptions pEngineOptions) {
-        Engine e = new LimitedFPSEngine(pEngineOptions, 60);
+        Engine e = new LimitedFPSEngine(pEngineOptions, Config.FPS);
         return e;
     }
-
-    
-    
     
 
-private void createControllers()
-	{
-	
+	/*
+	@Override
+	public void onPause(){
+		super.onPause();
+		music.pause();
+	}
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		if(music != null && !music.isPlaying())
+		{
+			music.resume();
+		}
+	}
+	 */
+
+
+	@Override
+	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback)
+			throws Exception {
+		game = new GameScene();
+		menu = new MenuScene();
 		
-	    final Rectangle left = new Rectangle(20, CAMERA_HEIGHT - 70, 60, 60, this.getVertexBufferObjectManager())
-	    {
-	        public boolean onAreaTouched(TouchEvent touchEvent, float X, float Y)
-	        {
-	            if (touchEvent.isActionUp())
-	            {
-	                joueur.move(-1, 0);
-	            }
-	            return true;
-	        };
-	    };
-	    left.setColor(0.5f,0.5f,0.5f);
-	    
-	    final Rectangle right = new Rectangle(CAMERA_WIDTH - 80, CAMERA_HEIGHT - 70, 60, 60, this.getVertexBufferObjectManager())
-	    {
-	        public boolean onAreaTouched(TouchEvent touchEvent, float X, float Y)
-	        {
-	            if (touchEvent.isActionUp())
-	            {
-	            	joueur.move(1, 0);
-	            }
-	            return true;
-	        };
-	    };
-	    right.setColor(0.5f,0.5f,0.5f);
-	    
-	    scene.registerTouchArea(left);
-	    scene.registerTouchArea(right);
-	    scene.attachChild(left);
-	    scene.attachChild(right);
+		//game.createRessources();
+		//game.createScene();
+		menu.createRessources();
+		menu.createScene();
+		
+		this.getEngine().setScene(menu);
+		
+		pOnCreateSceneCallback.onCreateSceneFinished(menu);
+	}
 
-	    
+	@Override
+	public void onPopulateScene(Scene pScene,
+			OnPopulateSceneCallback pOnPopulateSceneCallback) throws Exception {
+		pOnPopulateSceneCallback.onPopulateSceneFinished();
+	}
+	
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		INSTANCE = this;
+		
+	}
+	
+	@Override
+	public void onPause(){
+		super.onPause();
+		INSTANCE = this;
+
+		if(AudioManager.isMusicLoaded())
+		{
+			AudioManager.pause();
+		}
+		
+		if(currentScene == ScenesId.GAME_SCENE && game != null)
+		{
+			game.pause();
+		}
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		INSTANCE = this;
+
+		if(AudioManager.isMusicLoaded())
+		{
+			AudioManager.resume();
+		}
+		
+	}
+	
+	public static MainActivity getInstance(){
+		return INSTANCE;
+	}
+	
+	public void setScene(ScenesId id){
+		if(id == ScenesId.GAME_SCENE){
+			game = new GameScene();
+			game.createRessources();
+			game.createScene();
+			this.getEngine().setScene(game);
+		}
+		else if(id == ScenesId.MENU_SCENE){
+			menu = new MenuScene();
+			menu.createRessources();
+			menu.createScene();
+			this.getEngine().setScene(menu);
+		}
+		
+		currentScene = id;
 	}
 
 }

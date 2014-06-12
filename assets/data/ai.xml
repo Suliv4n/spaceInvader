@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formations>
+    <formation id="test">
+		<ai x="0" y="0" health="3" ></ai>
+		<ai x="1" y="0" health="3" ></ai>
+		<ai x="2" y="0" health="3" ></ai>
+		<!-- ><ai x="3" y="0" health="3" ></ai> -->
+		<ai x="4" y="0" health="3" ></ai>
+		<ai x="5" y="0" health="3" ></ai>
+		
+		<ai x="0" y="1" health="2" ></ai>
+		<ai x="1" y="1" health="2" ></ai>
+		<ai x="2" y="1" health="2" ></ai>
+		<ai x="3" y="1" health="2" ></ai>
+		<ai x="4" y="1" health="2" ></ai>
+		<ai x="5" y="1" health="2" ></ai>
+		
+		<ai x="0" y="2" health="1" ></ai>
+		<ai x="1" y="2" health="1" ></ai>
+		<ai x="2" y="2" health="1" ></ai>
+		<ai x="3" y="2" health="1" ></ai>
+		<ai x="4" y="2" health="1" ></ai>
+		<ai x="5" y="2" health="1" ></ai>
+    </formation>
+    
+</formations>

@@ -1,5 +1,8 @@
 package fr.licencepro.spaceinvader.object;
 
+import fr.licencepro.spaceinvader.Config;
+import fr.licencepro.spaceinvader.MainActivity;
+
 
 /**
  * Objey à afficher dans le jeu (joueurs, unites).
@@ -37,7 +40,9 @@ public abstract class GameObject {
 	 */
 	public void move(int dx, int dy){
 		//TODO gestion des collisions ?
-		x += dx;
+		if(x+dx >= Config.MIN_GAME_AREA_X && x+dx <= Config.MAX_GAME_AREA_X){
+			x += dx;
+		}
 		y += dy;
 	}
 }

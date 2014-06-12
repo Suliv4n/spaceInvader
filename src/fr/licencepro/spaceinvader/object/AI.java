@@ -8,12 +8,24 @@ package fr.licencepro.spaceinvader.object;
  */
 public class AI extends MOB{
 
-	public AI(int x, int y, int max_health) {
-		super(x, y, max_health);
+	private boolean firing = false;
+	
+	public AI(int x, int y, int max_health, int speed, Direction direction, float ratio) {
+		super(x, y, max_health, speed, direction, ratio);
 	}
 	
-	public void doAI(){
-		//TODO implémenter la logique de notre intelligence artificielle
+	public void commitFire(){
+		firing = true;
+	}
+	
+	public boolean isFiring(){
+		return firing;
+	}
+	
+	@Override
+	public Bullet fire(Direction direction){
+		firing = false;
+		return super.fire(direction);
 	}
 
 }
